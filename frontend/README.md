@@ -24,8 +24,9 @@ AutoFlow는 PDF 영수증·세금계산서·이메일을 수집해 OCR+LLM으로
 | RPA 모니터링 | `admin_rpa.html` | 봇 상태/큐, 로그, 수동 실행, 일일 리포트 |
 | 설정·계정 | `preferences.html` | 프로필/권한, 알림, ERP 연결 상태 |
 | 인증 | `login.html` | 로그인 및 시연용 데모 진입 |
+| 시연 데이터 | `samples.html` | 가상 영수증·세금계산서·이메일 샘플을 선택해 업로드/검토 흐름 실행 |
 
-요청의 “총 6개 핵심 페이지”와 로그인/회원가입 항목이 별도 7번으로 서술되어 있으므로, 로그인과 회원가입을 `login.html`의 탭으로 묶어 6개 엔트리로 구성합니다. 실제 회원가입 정책이 없는 사내 서비스라면 가입 탭을 비활성/초대 안내로 바꾸세요.
+요청의 핵심 6개 화면은 유지하고, 면접 시연을 돕는 `samples.html`을 공통 헤더에서 접근 가능한 보조 페이지로 추가했습니다. 로그인과 회원가입은 `login.html`의 탭으로 묶었습니다. 실제 회원가입 정책이 없는 사내 서비스라면 가입 탭을 비활성/초대 안내로 바꾸세요.
 
 ## 디렉터리 구조
 
@@ -38,8 +39,13 @@ frontend/
   admin_rpa.html
   preferences.html
   login.html
+  samples.html
   assets/
     css/app.css
+    css/theme.css
+    css/dashboard.css
+    dashboard-automation.svg
+    dashboard-horizon.svg
     js/api.js       # 세 백엔드 API 어댑터 및 mock fallback
     js/app.js       # 공통 내비게이션, 사용자 메뉴, 날짜, 맨 위 버튼
     js/dashboard.js
@@ -48,7 +54,12 @@ frontend/
     js/rpa.js
     js/preferences.js
     js/auth.js
+    js/samples.js
 ```
+
+`시연 데이터`는 화면 렌더링용 가상 문서를 `sessionStorage`로 업로드 화면에 전달합니다. 샘플 문서 승인 버튼은 데모 완료 메시지만 보여주며 실제 ERP/RPA API를 호출하지 않습니다. 발표 중 실제 문서 업로드와 샘플 시연을 혼동하지 않도록 각 샘플과 업로드 원본에 데모 표시를 노출합니다. 기본 색상은 웜 뉴트럴, 세이지, 브론즈로 제한하고, 대시보드의 벡터 아트도 같은 색조로 맞춥니다.
+
+대시보드의 프로세스 레인은 최근 문서 정보를 사용해 수집 → AI 분석 → 검증 → RPA → 완료 순서를 반복 시각화합니다. 현재는 화면 시연용 프리뷰이며, 실제 진행 상태 연동은 `GET /api/v1/rpa/runs/{runId}` 또는 SSE 로그 이벤트 계약을 백엔드와 합의한 뒤 단계 값을 구독하도록 교체합니다. 사용자가 OS의 동작 줄이기 설정을 선택한 경우 자동 애니메이션을 정지합니다.
 
 ## 공통 UI/UX 규칙
 
